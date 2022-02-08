@@ -1,0 +1,38 @@
+{
+    "name": "illusionist/searcher",
+    "type": "library",
+    "description": "Generates database queries based on search syntax.",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "keywords": ["search", "scout", "orm", "laravel", "thinkphp"],
+    "authors": [
+        {
+            "name": "kayson",
+            "email": "kayson@huida.cn"
+        }
+    ],
+    "require": {
+        "php": ">=5.6",
+        "hoa/compiler": "^3.17",
+        "nesbot/carbon": "^1.39"
+    },
+    "require-dev": {
+        "codedungeon/phpunit-result-printer": "^0.5",
+        "illuminate/database": "^5.4",
+        "phpunit/phpunit": "^5.0",
+        "topthink/think-orm": "^1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Illusionist\\Searcher\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
