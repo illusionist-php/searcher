@@ -785,15 +785,17 @@ abstract class SearchParser
      */
     protected function isOperatorExpression($expression)
     {
-        if (!is_array($expression) || count($expression) !== 2) {
+        if (
+            !is_array($expression) ||
+            count($expression) !== 2 ||
+            !isset($expression[0], $expression[1])
+        ) {
             return false;
         }
 
-        if (!isset($expression[0]) || !$this->isBasicOperator($expression[0])) {
-            return false;
-        }
+        list($operator, $count) = $expression;
 
-        return isset($expression[1]) && is_numeric($expression[1]);
+        return $this->isBasicOperator($operator) && is_numeric($count);
     }
 
     /**
@@ -909,17 +911,19 @@ abstract class SearchParser
      */
     protected function isLikeExpression($expression)
     {
-        if (!is_array($expression) || count($expression) !== 2) {
+        if (
+            !is_array($expression) ||
+            count($expression) !== 2 ||
+            !isset($expression[0], $expression[0])
+        ) {
             return false;
         }
 
-        if (!isset($expression[0]) || $expression[0] !== 'like') {
-            return false;
-        }
+        list($operator, $value) = $expression;
 
-        return isset($expression[1]) &&
-            mb_substr($expression[1], 0, 1) === '%' &&
-            mb_substr($expression[1], -1) === '%';
+        return $operator === 'like' &&
+            mb_substr($value, 0, 1) === '%' &&
+            mb_substr($value, -1) === '%';
     }
 
     /**
