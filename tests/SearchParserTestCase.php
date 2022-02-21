@@ -181,6 +181,10 @@ abstract class SearchParserTestCase extends TestCase
             [['comments' => ['title' => ['=', 'bar']]], 'select * from posts where exists (select * from comments where posts.id = comments.post_id and title = \'bar\')'],
             [['comments.title' => 'bar'], 'select * from posts where exists (select * from comments where posts.id = comments.post_id and title = \'bar\')'],
             [['comments' => [['>', 10], 'title' => 'bar']], 'select * from posts where (select count(*) from comments where posts.id = comments.post_id and title = \'bar\') > 10'],
+            [['one'], 'select * from posts where exists (select * from comments where posts.id = comments.post_id)'],
+            [['many'], 'select * from posts where exists (select * from comments inner join comment_post on comments.id = comment_post.comment_id where posts.id = comment_post.post_id)'],
+            [['oneThrough'], 'select * from posts where exists (select * from users inner join comments on comments.id = users.comment_id where posts.id = comments.post_id)'],
+            [['manyThrough'], 'select * from posts where exists (select * from users inner join comments on comments.id = users.comment_id where posts.id = comments.post_id)'],
 
             // Nested relationships.
             [['comments' => ['author' => ['name' => 'John']]], 'select * from posts where exists (select * from comments where posts.id = comments.post_id and exists (select * from users where comments.user_id = users.id and name = \'John\'))'],
@@ -201,6 +205,12 @@ abstract class SearchParserTestCase extends TestCase
             [['columns' => ['title', 'comments.title', 'comments.author.name']], 'select id, title from posts', ['comments' => ['select post_id, user_id, title from comments', 'author' => 'select id, name from users']]],
             [['not' => ['columns' => 'id,title']], 'select stars, likes, forks, watches, published, status, created_at, updated_at from posts'],
             [['not' => ['columns' => ['id', 'title', 'comments.title']]], 'select stars, likes, forks, watches, published, status, created_at, updated_at, id from posts', ['comments' => 'select id, user_id, stars, post_id from comments']],
+            [['columns' => ['title', 'one_count']], 'select title, (select count(*) from comments where posts.id = comments.post_id) as one_count from posts'],
+            [['columns' => ['title', 'one.title']], 'select id, title from posts', ['one' => 'select post_id, title from comments']],
+            [['columns' => ['title', 'many_count']], 'select title, (select count(*) from comments inner join comment_post on comments.id = comment_post.comment_id where posts.id = comment_post.post_id) as many_count from posts'],
+            [['columns' => ['title', 'many.title']], 'select id, title from posts', ['many' => 'select comments.title from comments inner join comment_post on comments.id = comment_post.comment_id']],
+            [['columns' => ['title', 'oneThrough.name']], 'select id, title from posts', ['oneThrough' => 'select users.name from users inner join comments on comments.id = users.comment_id']],
+            [['columns' => ['title', 'manyThrough.name']], 'select id, title from posts', ['manyThrough' => 'select users.name from users inner join comments on comments.id = users.comment_id']],
         ];
     }
 

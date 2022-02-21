@@ -20,6 +20,26 @@ class Post extends Model
         return $this->hasMany(Comment::class);
     }
 
+    public function one()
+    {
+        return $this->hasOne(Comment::class);
+    }
+
+    public function many()
+    {
+        return $this->belongsToMany(Comment::class);
+    }
+
+    public function oneThrough()
+    {
+        return $this->hasOneThrough(User::class, Comment::class);
+    }
+
+    public function manyThrough()
+    {
+        return $this->hasManyThrough(User::class, Comment::class);
+    }
+
     public function getQueryPhraseColumns($phrase)
     {
         if (is_numeric($phrase)) {

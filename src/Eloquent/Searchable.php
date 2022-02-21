@@ -133,15 +133,17 @@ trait Searchable
      * Get the local key and foreign key for the relationship.
      *
      * @param  string  $relation
+     * @param  boolean  $joined
      * @return array|false
      */
-    public function getRelationKeyNames($relation)
+    public function getRelationKeyNames($relation, &$joined = false)
     {
         if (!$this->isRelationAttribute($relation)) {
             return false;
         }
 
         $instance = $this->{$relation}();
+        $joined = $instance instanceof BelongsToMany || $instance instanceof HasManyThrough;
 
         if ($instance instanceof MorphOneOrMany) {
             return [
@@ -150,7 +152,7 @@ trait Searchable
             ];
         }
 
-        if ($instance instanceof HasOneOrMany) {
+        if ($instance instanceof HasOneOrMany || $instance instanceof HasManyThrough) {
             return [$instance->getLocalKeyName(), $instance->getForeignKeyName()];
         }
 
@@ -160,10 +162,6 @@ trait Searchable
 
         if ($instance instanceof BelongsToMany) {
             return [$instance->getParentKeyName(), null];
-        }
-
-        if ($instance instanceof HasManyThrough) {
-            return [$instance->getLocalKeyName(), null];
         }
 
         return false;

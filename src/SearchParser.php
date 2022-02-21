@@ -448,9 +448,10 @@ abstract class SearchParser
      * @param  string|array  $columns
      * @param  array  $localKeys
      * @param  boolean  $not
+     * @param  boolean  $qualified
      * @return $this
      */
-    protected function addSelectTerm($builder, $columns, $localKeys = [], $not = false)
+    protected function addSelectTerm($builder, $columns, $localKeys = [], $not = false, $qualified = false)
     {
         if (is_string($columns)) {
             $columns = explode(',', $columns);
@@ -460,6 +461,9 @@ abstract class SearchParser
         $parsed = $this->parseColumns($searchable, $columns, $localKeys, $not);
 
         if (!empty($parsed[0])) {
+            if ($qualified) {
+                $parsed[0] = array_map([$searchable, 'qualifyColumn'], $parsed[0]);
+            }
             $this->select($builder, $parsed[0]);
         }
 
@@ -554,14 +558,14 @@ abstract class SearchParser
     protected function createWithRelations($searchable, $relations, &$localKeys = [], $not = false)
     {
         foreach ($relations as $method => $columns) {
-            list($localKey, $foreignKey) = $searchable->getRelationKeyNames($method);
+            list($localKey, $foreignKey) = $searchable->getRelationKeyNames($method, $joined);
 
             if (!empty($localKey)) {
                 $localKeys[] = $localKey;
             }
 
-            $relations[$method] = function ($builder) use ($columns, $foreignKey, $not) {
-                $this->addSelectTerm($builder, $columns, (array) $foreignKey, $not);
+            $relations[$method] = function ($builder) use ($columns, $foreignKey, $not, $joined) {
+                $this->addSelectTerm($builder, $columns, (array) $foreignKey, $not, $joined);
             };
         }
 

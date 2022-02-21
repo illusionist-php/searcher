@@ -53,28 +53,31 @@ class SearchParser extends Parser
     }
 
     /**
-     * Set the columns to be selected.
+     * Add a select term to the builder.
      *
      * @param  mixed  $builder
-     * @param  array  $columns
-     * @return mixed
+     * @param  string|array  $columns
+     * @param  array  $localKeys
+     * @param  boolean  $not
+     * @param  boolean  $qualified
+     * @return $this
      */
-    protected function select($builder, $columns)
+    protected function addSelectTerm($builder, $columns, $localKeys = [], $not = false, $qualified = false)
     {
-        if ($columns !== ['*'] && $builder instanceof NestedsetBuilder) {
+        if ($builder instanceof NestedsetBuilder) {
             $model = $builder->getModel();
 
             array_push(
-                $columns,
+                $localKeys,
                 $model->getParentIdName(),
                 $model->getLftName(),
                 $model->getRgtName()
             );
 
-            $columns = array_unique($columns);
+            $localKeys = array_unique($localKeys);
         }
 
-        return $builder->select($columns);
+        return parent::addSelectTerm($builder, $columns, $localKeys, $not, $qualified);
     }
 
     /**

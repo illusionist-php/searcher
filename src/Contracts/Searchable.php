@@ -13,6 +13,14 @@ interface Searchable
     public function append($attributes);
 
     /**
+     * Qualify the given column name by the model's table.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function qualifyColumn($column);
+
+    /**
      * Get the actual columns that exist on the database and can be guarded.
      *
      * @return array
@@ -39,9 +47,10 @@ interface Searchable
      * Get the local key and foreign key for the relationship.
      *
      * @param  string  $relation
+     * @param  boolean  $joined
      * @return array|false
      */
-    public function getRelationKeyNames($relation);
+    public function getRelationKeyNames($relation, &$joined = false);
 
     /**
      * Determine if a get mutator exists for an attribute.
