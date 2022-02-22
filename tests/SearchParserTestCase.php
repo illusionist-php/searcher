@@ -183,8 +183,10 @@ abstract class SearchParserTestCase extends TestCase
             [['comments' => [['>', 10], 'title' => 'bar']], 'select * from posts where (select count(*) from comments where posts.id = comments.post_id and title = \'bar\') > 10'],
             [['one'], 'select * from posts where exists (select * from comments where posts.id = comments.post_id)'],
             [['many'], 'select * from posts where exists (select * from comments inner join comment_post on comments.id = comment_post.comment_id where posts.id = comment_post.post_id)'],
-            [['oneThrough'], 'select * from posts where exists (select * from users inner join comments on comments.id = users.comment_id where posts.id = comments.post_id)'],
-            [['manyThrough'], 'select * from posts where exists (select * from users inner join comments on comments.id = users.comment_id where posts.id = comments.post_id)'],
+            [['through'], 'select * from posts where exists (select * from users inner join comments on comments.id = users.comment_id where posts.id = comments.post_id)'],
+            [['oneSelf'], 'select * from posts where exists (select * from posts as laravel_reserved_0 where posts.id = laravel_reserved_0.post_id)'],
+            [['manySelf'], 'select * from posts where exists (select * from posts as laravel_reserved_0 inner join post_post on laravel_reserved_0.id = post_post.post_id where posts.id = post_post.post_id)'],
+            [['throughSelf'], 'select * from posts where exists (select * from users inner join posts as laravel_reserved_0 on laravel_reserved_0.id = users.post_id where posts.id = laravel_reserved_0.post_id)'],
 
             // Nested relationships.
             [['comments' => ['author' => ['name' => 'John']]], 'select * from posts where exists (select * from comments where posts.id = comments.post_id and exists (select * from users where comments.user_id = users.id and name = \'John\'))'],
@@ -209,8 +211,10 @@ abstract class SearchParserTestCase extends TestCase
             [['columns' => ['title', 'one.title']], 'select id, title from posts', ['one' => 'select post_id, title from comments']],
             [['columns' => ['title', 'many_count']], 'select title, (select count(*) from comments inner join comment_post on comments.id = comment_post.comment_id where posts.id = comment_post.post_id) as many_count from posts'],
             [['columns' => ['title', 'many.title']], 'select id, title from posts', ['many' => 'select comments.title from comments inner join comment_post on comments.id = comment_post.comment_id']],
-            [['columns' => ['title', 'oneThrough.name']], 'select id, title from posts', ['oneThrough' => 'select users.name from users inner join comments on comments.id = users.comment_id']],
-            [['columns' => ['title', 'manyThrough.name']], 'select id, title from posts', ['manyThrough' => 'select users.name from users inner join comments on comments.id = users.comment_id']],
+            [['columns' => ['title', 'through.name']], 'select id, title from posts', ['through' => 'select users.name from users inner join comments on comments.id = users.comment_id']],
+            [['columns' => ['title', 'oneSelf.title']], 'select id, title from posts', ['oneSelf' => 'select title from posts']],
+            [['columns' => ['title', 'manySelf.title']], 'select id, title from posts', ['manySelf' => 'select posts.title from posts inner join post_post on posts.id = post_post.post_id']],
+            [['columns' => ['title', 'throughSelf.title']], 'select id, title from posts', ['throughSelf' => 'select * from users inner join posts on posts.id = users.post_id']],
         ];
     }
 
