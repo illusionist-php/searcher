@@ -16,7 +16,7 @@ class SearchParserTest extends TestCase
      *
      * @return void
      */
-    protected function setUp(): void
+    protected function setUp()
     {
         Db::setConfig(['type' => 'sqlite', 'database' => ':memory:']);
 

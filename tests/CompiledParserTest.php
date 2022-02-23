@@ -20,7 +20,7 @@ class CompiledParserTest extends TestCase
      *
      * @return void
      */
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->parser = new CompiledParser();
     }

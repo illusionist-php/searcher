@@ -19,7 +19,7 @@ abstract class SearchParserTestCase extends TestCase
      *
      * @return void
      */
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->parser = $this->newParser();
     }
