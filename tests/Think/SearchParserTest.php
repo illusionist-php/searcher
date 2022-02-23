@@ -55,9 +55,11 @@ class SearchParserTest extends TestCase
                 '/\(select count\(\*\) as tp_count from (\w+) where \((\w+) =(\w+)\.(\w+)\) limit 1\)/',
                 '/\(select count\(\*\) as tp_count from (\w+) inner join (\w+) pivot on pivot\.(\w+) = (\w+\.\w+) where pivot\.(\w+) = (\w+\.\w+) limit 1\)/',
                 '/limit 0 /',
+                '/(\w+) (think_reserved_\d+) /',
+                '/think_reserved_\d+/',
             ],
-            ['$1 = $2', 'where $1', '!=', '(select count(*) from $1 where $3.$4 = $1.$2)', '(select count(*) from $1 inner join $2 on $4 = $2.$3 where $6 = $2.$5)', ''],
-            $s = preg_replace_callback('/([A-Z]{2,}|\(\s+|\s+\)|,|\s{2,})/', static function ($matches) {
+            ['$1 = $2', 'where $1', '!=', '(select count(*) from $1 where $3.$4 = $1.$2)', '(select count(*) from $1 inner join $2 on $4 = $2.$3 where $6 = $2.$5)', '', '$1 as $2 ', 'laravel_reserved_0'],
+            preg_replace_callback('/([A-Z]{2,}|\(\s+|\s+\)|,|\s{2,})/', static function ($matches) {
 
                 switch ($matches[1][0]) {
                     case ',':

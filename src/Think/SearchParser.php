@@ -166,32 +166,39 @@ class SearchParser extends Parser
 
         /**@var \think\Model $related */
         $related = $relation->getModel();
-        $query = $related->db();
+        $relatedTable = $this->fixRelationTable($parent, $query = $related->db());
 
         if ($relation instanceof HasManyThrough) {
             /**@var \think\Model $through */
             $through = static::getObjectPropertyValue($relation, 'through');
             $through = new $through;
 
-            $query->join(
-                $through->getTable(),
-                $through->qualifyColumn($through->getPk()) . ' = ' .
-                    $related->qualifyColumn(static::getObjectPropertyValue($relation, 'throughKey'))
-            )->whereColumn(
+            $throughQuery = $through->db();
+            $throughTable = $this->fixRelationTable($parent, $throughQuery);
+
+            $query->join($throughQuery->getTable(), sprintf(
+                '%s.%s = %s.%s',
+                $throughTable,
+                $through->getPk(),
+                $relatedTable,
+                static::getObjectPropertyValue($relation, 'throughKey')
+            ))->whereColumn(
                 $parent->qualifyColumn(static::getObjectPropertyValue($relation, 'localKey')),
                 '=',
-                $through->qualifyColumn(static::getObjectPropertyValue($relation, 'foreignKey'))
+                $throughTable . '.' . static::getObjectPropertyValue($relation, 'foreignKey')
             );
         } elseif ($relation instanceof BelongsToMany) {
             /**@var \think\model\Pivot $pivot */
             $pivot = static::getObjectPropertyValue($relation, 'pivot');
             $table = $pivot->getTable();
 
-            $query->join(
+            $query->join($table, sprintf(
+                '%s.%s = %s.%s',
+                $relatedTable,
+                $related->getPk(),
                 $table,
-                $related->qualifyColumn($related->getPk()) . ' = ' .
-                    $table . '.' . static::getObjectPropertyValue($relation, 'foreignKey')
-            )->whereColumn(
+                static::getObjectPropertyValue($relation, 'foreignKey')
+            ))->whereColumn(
                 $parent->qualifyColumn($parent->getPk()),
                 '=',
                 $table . '.' . static::getObjectPropertyValue($relation, 'localKey')
@@ -200,17 +207,39 @@ class SearchParser extends Parser
             $query->whereColumn(
                 $parent->qualifyColumn(static::getObjectPropertyValue($relation, 'foreignKey')),
                 '=',
-                $related->qualifyColumn(static::getObjectPropertyValue($relation, 'localKey'))
+                $relatedTable . '.' . static::getObjectPropertyValue($relation, 'localKey')
             );
         } elseif ($relation instanceof HasOne || $relation instanceof HasMany) {
             $query->whereColumn(
                 $parent->qualifyColumn(static::getObjectPropertyValue($relation, 'localKey')),
                 '=',
-                $related->qualifyColumn(static::getObjectPropertyValue($relation, 'foreignKey'))
+                $relatedTable . '.' . static::getObjectPropertyValue($relation, 'foreignKey')
             );
         }
 
         return $query->field($columns);
+    }
+
+    /**
+     * Fix the table name of the a given relation model.
+     *
+     * @param  \think\db\Query  $parent
+     * @param  \think\db\Query  $related
+     * @return string
+     */
+    protected function fixRelationTable($parent, $related)
+    {
+        $table = $related->getTable();
+
+        if ($table !== $parent->getTable()) {
+            return $table;
+        }
+
+        $alias = $this->getRelationCountHash();
+
+        $related->setOption('table', $table . ' ' . $alias);
+
+        return $alias;
     }
 
     /**

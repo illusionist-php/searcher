@@ -27,19 +27,29 @@ class Post extends Model
         return $this->hasOne(Comment::class);
     }
 
+    public function oneSelf()
+    {
+        return $this->hasOne(static::class);
+    }
+
     public function many()
     {
         return $this->belongsToMany(Comment::class, 'comment_post');
     }
 
-    public function oneThrough()
+    public function manySelf()
+    {
+        return $this->belongsToMany(static::class);
+    }
+
+    public function through()
     {
         return $this->hasManyThrough(User::class, Comment::class);
     }
 
-    public function manyThrough()
+    public function throughSelf()
     {
-        return $this->hasManyThrough(User::class, Comment::class);
+        return $this->hasManyThrough(User::class, static::class);
     }
 
     public function getQueryPhraseColumns($phrase)
