@@ -13,6 +13,7 @@ class Post extends Model
 
     protected $casts = [
         'published' => 'bool',
+        'created_at' => 'datetime',
     ];
 
     public function comments()
