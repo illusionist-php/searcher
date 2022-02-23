@@ -219,26 +219,26 @@ abstract class SearchParser
         switch ($precision) {
             case 'year':
                 return $end
-                    ? $datetime->setDate($datetime->format('Y'), 12, 31)->setTime(23, 59, 59, 999999)
-                    : $datetime->setDate($datetime->format('Y'), 1, 1)->setTime(0, 0, 0, 0);
+                    ? $datetime->setDate($datetime->format('Y'), 12, 31)->setTime(23, 59, 59)
+                    : $datetime->setDate($datetime->format('Y'), 1, 1)->setTime(0, 0, 0);
             case 'month':
                 return $end
                     ? $datetime->setDate($datetime->format('Y'), $datetime->format('n'), $datetime->format('t'))
-                    ->setTime(23, 59, 59, 999999)
+                    ->setTime(23, 59, 59)
                     : $datetime->setDate($datetime->format('Y'), $datetime->format('n'), 1)
-                    ->setTime(0, 0, 0, 0);
+                    ->setTime(0, 0, 0);
             case 'day':
                 return $end
-                    ? $datetime->setTime(23, 59, 59, 999999)
-                    : $datetime->setTime(0, 0, 0, 0);
+                    ? $datetime->setTime(23, 59, 59)
+                    : $datetime->setTime(0, 0, 0);
             case 'hour':
                 return $end
-                    ? $datetime->setTime($datetime->format('G'), 59, 59, 999999)
-                    : $datetime->setTime($datetime->format('G'), 0, 0, 0);
+                    ? $datetime->setTime($datetime->format('G'), 59, 59)
+                    : $datetime->setTime($datetime->format('G'), 0, 0);
             case 'minute':
                 return $end
-                    ? $datetime->setTime($datetime->format('G'), $datetime->format('i'), 59, 999999)
-                    : $datetime->setTime($datetime->format('G'), $datetime->format('i'), 0, 0);
+                    ? $datetime->setTime($datetime->format('G'), $datetime->format('i'), 59)
+                    : $datetime->setTime($datetime->format('G'), $datetime->format('i'), 0);
             default:
                 return $datetime;
         }
@@ -879,7 +879,6 @@ abstract class SearchParser
                 ]
             ];
         } catch (Exception $e) {
-            var_dump($e->getMessage());
             return [$operator, $val];
         }
     }
