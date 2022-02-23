@@ -13,14 +13,13 @@
     ],
     "require": {
         "php": ">=5.6",
-        "hoa/compiler": "^3.17",
-        "nesbot/carbon": "^1.39"
+        "hoa/compiler": "^3.17"
     },
     "require-dev": {
         "codedungeon/phpunit-result-printer": "^0.5",
-        "illuminate/database": "^5.4",
+        "illuminate/database": "5.4.0",
         "phpunit/phpunit": "^5.0",
-        "topthink/think-orm": "^1.2"
+        "topthink/think-orm": "1.2.8"
     },
     "autoload": {
         "psr-4": {

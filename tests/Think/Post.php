@@ -47,11 +47,6 @@ class Post extends Model
         return $this->hasManyThrough(User::class, Comment::class);
     }
 
-    public function throughSelf()
-    {
-        return $this->hasManyThrough(User::class, static::class);
-    }
-
     public function getQueryPhraseColumns($phrase)
     {
         if (is_numeric($phrase)) {
