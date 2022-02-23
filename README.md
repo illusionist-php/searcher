@@ -1,9 +1,14 @@
 <h1 align="center">Illusionist Searcher</h1>
-
-<p align="center">
-<img src="https://img.shields.io/badge/tests-developing-green?logo=github" alt="Build Status">
-<img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
-</p>
+<div align="center">
+Generates database queries based on search syntax.
+<br /><br />
+![packagist](https://img.shields.io/packagist/v/illusionist/searcher?style=flat-square)
+![php](https://img.shields.io/packagist/php-v/illusionist/searcher?style=flat-square)
+![downloads](https://img.shields.io/packagist/dm/illusionist/searcher)
+![license](https://img.shields.io/packagist/l/illusionist/searcher?style=flat-square)
+<br /><br />
+English | [中文](README-zh_CN.md) 
+</div>
 
 ## ✨ Features
 
@@ -25,15 +30,37 @@ composer require illusionist/searcher
 
 Add the `Searchable` trait to your model's
 
+#### Laravel/Lumen
+
 ```php
 <?php
 
 namnespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illusionist\Searcher\Contracts\Searchable as SearchableContract;
 use Illusionist\Searcher\Eloquent\Searchable;
 
-class Article extends Model
+class Post extends Model implements SearchableContract
+{
+    use Searchable;
+}
+```
+
+#### ThinkPHP
+
+Your ThinkPHP version must be `>= 5.x`
+
+```php
+<?php
+
+namnespace app\model;
+
+use think\Model;
+use Illusionist\Searcher\Contracts\Searchable as SearchableContract;
+use Illusionist\Searcher\Eloquent\Searchable;
+
+class Post extends Model implements SearchableContract
 {
     use Searchable;
 }
@@ -42,7 +69,7 @@ class Article extends Model
 Now you can create a database query using the [search syntax](#syntax)
 
 ```php
-Article::search('title:"Hello world" sort:-created_at,published')->get();
+Post::search('title:"Hello world" sort:-created_at,published')->get();
 ```
 
 ## <a id="syntax"></a> 💡 Syntax
@@ -103,7 +130,7 @@ Note that the spaces between operators don't matter for the string syntax
 
 ```php
 ['published']              // published = true
-['not' => 'created_at']    // published = false
+['not' => 'published']    // published = false
 ```
 
 ### Dates
@@ -253,11 +280,11 @@ Note that the spaces between operators don't matter for the string syntax
 
 **String syntax**
 
-The term `NULL` is case sensitive.
+The term `NULL` is not case sensitive.
 
 ```php
 'body:NULL'         // body is null
-'not body:NULL'     // body is not null
+'not body:null'     // body is not null
 ```
 
 **Array syntax**
@@ -269,7 +296,7 @@ The term `NULL` is case sensitive.
 
 ### Searchable
 
-The queried term must not match a boolean column, otherwise it will be handled as a boolean query.
+The queried term must not match a `boolean` or `date` column, otherwise it will be handled as a `boolean` or `date` query.
 
 **String syntax**
 
@@ -393,3 +420,217 @@ Keyword use `studly-caps` format, e.g. `andOr` can be written as `and_or` or `an
 // Nested relationships
 ['comments' => ['author' => ['name' => 'John']]]           // Has comments from the author named John
 ```
+
+## ⚔️ Advanced
+
+### Searchable
+
+If a query term is not `boolean` or `date` column, it call `getQueryPhraseColumns` to get searchable columns. 
+
+If no operator is specified in the return value, `like` is used by default. 
+
+**For example:**
+
+```php
+<?php
+
+namnespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illusionist\Searcher\Contracts\Searchable as SearchableContract;
+use Illusionist\Searcher\Eloquent\Searchable;
+
+class Post extends Model implements SearchableContract
+{
+    use Searchable;
+
+    /**
+     * Get the columns of the query phrase.
+     *
+     * @param  string  $phrase
+     * @return array
+     */
+    public function getQueryPhraseColumns($phrase)
+    {
+        if (is_numeric($phrase)) {
+            return ['stars' => '>=', 'comments.stars' => '>='];
+        }
+
+        return ['title'];
+    }
+}
+
+'lonely' // Equivalent to:
+$query->where('title', '%lonely%');
+
+'3000' // Equivalent to:
+$query->where(function ($query) {
+    $query->where('stars', '>=', '3000', 'or')
+        ->whereHas('comments', function ($query) {
+            $query->where('stars', '>=', '3000')
+        });
+});
+```
+
+### Relationship
+
+If you define a relation method, it will be used to query relationships.
+
+```php
+<?php
+
+namnespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illusionist\Searcher\Contracts\Searchable as SearchableContract;
+use Illusionist\Searcher\Eloquent\Searchable;
+
+class Post extends Model implements SearchableContract
+{
+    use Searchable;
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+}
+
+// Querying Relationship Existence
+'comments'                          // $query->has('comments');
+
+// Counting Related Models
+'select:comments_count'            // $query->withCount('comments');
+
+// Eager Loading
+'select:comments'                  // $query->select('id')->with('comments');
+'select:comments.title'            // $query->select('id')->with('comments:id,title')
+```
+
+### Configuring searchable columns
+
+Query terms that are not in the `searchable` property will be discarded, the default value is the `real columns` of the model table and the `relation method name`.
+
+```php
+<?php
+
+namnespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illusionist\Searcher\Contracts\Searchable as SearchableContract;
+use Illusionist\Searcher\Eloquent\Searchable;
+
+class Post extends Model implements SearchableContract
+{
+    use Searchable;
+
+    protected $searchable = ['author', 'created_at'];
+}
+
+'author:kayson title:hello'  // Equivalent to:
+$query->where('author', '=', 'kayson');
+```
+
+### Configuring boolean and date column
+
+#### Laravel/Lumen
+
+Use the `casts` attribute to specify boolean and date columns.
+
+```php
+<?php
+
+namnespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illusionist\Searcher\Contracts\Searchable as SearchableContract;
+use Illusionist\Searcher\Eloquent\Searchable;
+
+class Post extends Model implements SearchableContract
+{
+    use Searchable;
+
+    protected $casts = [
+        'published' => 'boolean',
+        'created_at' => 'datetime',
+    ];
+}
+```
+
+#### ThinkPHP
+
+Use the `type` attribute to specify boolean and date columns.
+
+```php
+<?php
+
+namnespace app\model;
+
+use think\Model;
+use Illusionist\Searcher\Contracts\Searchable as SearchableContract;
+use Illusionist\Searcher\Eloquent\Searchable;
+
+class Post extends Model implements SearchableContract
+{
+    use Searchable;
+
+    protected $type = [
+        'published' => 'boolean',
+        'created_at' => 'datetime',
+    ];
+}
+```
+
+### Configuring special keywords
+
+Implement custom keywords and symbiotic columns by overriding the `getRelaSearchName` function.
+
+`selec`, `order_by`, `offset` is a reserved keywords, please do not conflict with the query terms.
+
+```php
+<?php
+
+namnespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illusionist\Searcher\Contracts\Searchable as SearchableContract;
+use Illusionist\Searcher\Eloquent\Searchable;
+
+class Post extends Model implements SearchableContract
+{
+    use Searchable;
+
+    /**
+     * Get the real name of the given search column.
+     *
+     * @param  string  $key
+     * @return string|array
+     */
+    public function getRelaSearchName($key)
+    {
+       switch ($key) {
+            case 'field':
+                return 'select';
+            case 'sort':
+                return 'order_by';
+            case 'from':
+                return 'offset';
+            case 'stars':
+                return ['stars', 'comments.stars'];
+            default:
+                return $key;
+        }
+    }
+}
+
+'field:id,name' // Equivalent to:
+$query->select(['id', 'name']);
+
+'stars:3000' // Equivalent to:
+$query->where(function ($query) {
+    $query->where('stars', '>=', '3000', 'or')
+        ->whereHas('comments', function ($query) {
+            $query->where('stars', '>=', '3000')
+        });
+});
+```
+
