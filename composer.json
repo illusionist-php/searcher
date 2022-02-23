@@ -16,7 +16,6 @@
         "hoa/compiler": "^3.17"
     },
     "require-dev": {
-        "codedungeon/phpunit-result-printer": "^0.5",
         "illuminate/database": "5.4.0",
         "phpunit/phpunit": "^5.0",
         "topthink/think-orm": "1.2.8"
