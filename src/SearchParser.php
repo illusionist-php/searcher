@@ -879,6 +879,7 @@ abstract class SearchParser
                 ]
             ];
         } catch (Exception $e) {
+            var_dump($e->getMessage());
             return [$operator, $val];
         }
     }
