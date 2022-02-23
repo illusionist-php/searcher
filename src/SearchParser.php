@@ -518,6 +518,8 @@ abstract class SearchParser
                 }
             } elseif (!$searchable->isVisible($column)) {
                 // Skip hidden attribute.
+            } elseif ($searchable->isRelationAttribute($column)) {
+                $results[2][$column] = ['*'];
             } else {
                 if ($searchable->hasGetMutator($column)) {
                     $results[1][] = $column;
