@@ -235,7 +235,8 @@ trait Searchable
      */
     public function isDateAttribute($key)
     {
-        return $Key === 'created_at';
+        return in_array($key, $this->getDates()) ||
+            $this->isDateCastable($key);
     }
 
     /**
