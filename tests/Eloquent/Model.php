@@ -4,11 +4,10 @@ namespace Tests\Eloquent;
 
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\SQLiteConnection;
-use Illusionist\Searcher\Contracts\Searchable as SearchableContract;
 use Illusionist\Searcher\Eloquent\Searchable;
 use PDO;
 
-abstract class Model extends EloquentModel implements SearchableContract
+abstract class Model extends EloquentModel
 {
     use Searchable;
 
