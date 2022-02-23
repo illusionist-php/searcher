@@ -235,7 +235,7 @@ trait Searchable
      */
     public function isDateAttribute($key)
     {
-        return parent::isDateAttribute($key);
+        return $Key === 'created_at';
     }
 
     /**
