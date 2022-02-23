@@ -1025,7 +1025,7 @@ abstract class SearchParser
      * @param  bool  $not
      * @return mixed
      */
-    public function whereNull($builder, $column, $boolean = 'and', $not = false)
+    protected function whereNull($builder, $column, $boolean = 'and', $not = false)
     {
         return $builder->whereNull($column, $boolean, $not);
     }
@@ -1040,7 +1040,7 @@ abstract class SearchParser
      * @param  bool  $not
      * @return mixed
      */
-    public function whereBetween($builder, $column, $values, $boolean = 'and', $not = false)
+    protected function whereBetween($builder, $column, $values, $boolean = 'and', $not = false)
     {
         return $builder->whereBetween($column, $values, $boolean, $not);
     }
@@ -1055,7 +1055,7 @@ abstract class SearchParser
      * @param  bool  $not
      * @return mixed
      */
-    public function whereIn($builder, $column, $values, $boolean = 'and', $not = false)
+    protected function whereIn($builder, $column, $values, $boolean = 'and', $not = false)
     {
         return $builder->whereIn($column, $values, $boolean, $not);
     }

@@ -353,7 +353,7 @@ class SearchParser extends Parser
      * @param  bool  $not
      * @return \think\db\Query
      */
-    public function whereNull($builder, $column, $boolean = 'and', $not = false)
+    protected function whereNull($builder, $column, $boolean = 'and', $not = false)
     {
         return $builder->{$not ? 'whereNotNull' : 'whereNull'}($column, $boolean);
     }
@@ -368,7 +368,7 @@ class SearchParser extends Parser
      * @param  bool  $not
      * @return \think\db\Query
      */
-    public function whereBetween($builder, $column, $values, $boolean = 'and', $not = false)
+    protected function whereBetween($builder, $column, $values, $boolean = 'and', $not = false)
     {
         return $builder->{$not ? 'whereNotBetween' : 'whereBetween'}($column, $values, $boolean);
     }
@@ -383,7 +383,7 @@ class SearchParser extends Parser
      * @param  bool  $not
      * @return \think\db\Query
      */
-    public function whereIn($builder, $column, $values, $boolean = 'and', $not = false)
+    protected function whereIn($builder, $column, $values, $boolean = 'and', $not = false)
     {
         return $builder->{$not ? 'whereNotIn' : 'whereIn'}($column, $values, $boolean);
     }
