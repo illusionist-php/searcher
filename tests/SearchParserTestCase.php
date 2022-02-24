@@ -227,18 +227,21 @@ abstract class SearchParserTestCase extends TestCase
      * @param  array  $input
      * @param  array  $expected
      * @param  array  $eagerLoads
-     * @param  array  $appends
+     * @param  array|null  $appends
      * @return void
      * @dataProvider success
      */
-    public function testParserWithSuccess($input, $expected, $eagerLoads = [], $appends = [])
+    public function testParserWithSuccess($input, $expected, $eagerLoads = [], $appends = null)
     {
         $builder = $this->parser->import($input);
         $actual = $this->getSql($builder);
 
         $this->assertEagerLoads($builder, $eagerLoads)
-            ->assertAppend($builder, $appends)
             ->assertEquals($expected, $actual);
+
+        if ($appends !== null) {
+            $this->assertAppend($builder, $appends);
+        }
     }
 
     /**
