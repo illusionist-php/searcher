@@ -2,16 +2,11 @@
 
 namespace Illusionist\Searcher\Contracts;
 
+/**
+ * @method $this append(array $attributes) Append attributes to query when building a query.
+ */
 interface Searchable
 {
-    /**
-     * Append attributes to query when building a query.
-     *
-     * @param  array  $attributes
-     * @return $this
-     */
-    public function append(array $attributes);
-
     /**
      * Qualify the given column name by the model's table.
      *

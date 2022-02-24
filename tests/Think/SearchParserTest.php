@@ -7,6 +7,7 @@ use ReflectionClass;
 use Tests\SearchParserTestCase as TestCase;
 use think\db\Query;
 use think\Db;
+use think\Model;
 use think\model\relation\BelongsToMany;
 use think\model\relation\HasManyThrough;
 
@@ -20,8 +21,8 @@ class SearchParserTest extends TestCase
     protected function setUp(): void
     {
         Db::setConfig([
-           'type' => 'sqlite',
-           'database' => ':memory:',
+            'type' => 'sqlite',
+            'database' => ':memory:',
             'datetime_format' => 'Y-m-d H:i:s',
             'query' => Query::class,
         ]);
@@ -129,5 +130,22 @@ class SearchParserTest extends TestCase
         }
 
         return $this;
+    }
+
+    /**
+     * Get the appends attribute of the builder.
+     *
+     * @param  \think\db\Query  $builder
+     * @return array
+     */
+    protected function getBuilderAppends($builder)
+    {
+        $reflection = new ReflectionClass(Model::class);
+
+        $property = $reflection->getProperty('append');
+
+        $property->setAccessible(true);
+
+        return $property->getValue($builder->getModel());
     }
 }
