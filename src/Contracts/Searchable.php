@@ -7,10 +7,10 @@ interface Searchable
     /**
      * Append attributes to query when building a query.
      *
-     * @param  array|string  $attributes
+     * @param  array  $attributes
      * @return $this
      */
-    public function append($attributes);
+    public function append(array $attributes);
 
     /**
      * Qualify the given column name by the model's table.

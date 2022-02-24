@@ -332,7 +332,7 @@ class SearchParser extends Parser
     {
         if ($column instanceof Closure) {
             $column = static function ($query) use ($builder, $column) {
-                $query->model($builder->getModel())->table($builder->getTable());
+                $query->model($builder->getModel())->setOption('table', $builder->getTable());
                 return $column($query);
             };
         }

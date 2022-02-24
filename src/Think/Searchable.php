@@ -4,6 +4,7 @@ namespace Illusionist\Searcher\Think;
 
 use Illusionist\Searcher\CompiledParser;
 use think\Db;
+use think\Model;
 use think\model\relation\BelongsTo;
 use think\model\relation\BelongsToMany;
 use think\model\relation\HasMany;
@@ -34,9 +35,9 @@ trait Searchable
      * @param  array  $data
      * @param  bool  $isUpdate
      * @param  mixed  $where
-     * @return static
+     * @return Model
      */
-    public function newInstance($data = [], $isUpdate = false, $where = null)
+    public function newInstance(array $data = [], bool $isUpdate = false, $where = null): Model
     {
         $model = parent::newInstance($data, $isUpdate, $where);
 

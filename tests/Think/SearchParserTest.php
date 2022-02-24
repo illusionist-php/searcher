@@ -5,6 +5,7 @@ namespace Tests\Think;
 use Illusionist\Searcher\Think\SearchParser;
 use ReflectionClass;
 use Tests\SearchParserTestCase as TestCase;
+use think\db\Query;
 use think\Db;
 use think\model\relation\BelongsToMany;
 use think\model\relation\HasManyThrough;
@@ -16,9 +17,14 @@ class SearchParserTest extends TestCase
      *
      * @return void
      */
-    protected function setUp()
+    protected function setUp(): void
     {
-        Db::setConfig(['type' => 'sqlite', 'database' => ':memory:']);
+        Db::setConfig([
+           'type' => 'sqlite',
+           'database' => ':memory:',
+            'datetime_format' => 'Y-m-d H:i:s',
+            'query' => Query::class,
+        ]);
 
         parent::setUp();
     }
@@ -82,34 +88,10 @@ class SearchParserTest extends TestCase
                 $value = "'$value'";
             }
 
-            $sql = preg_replace(
-                '/' . preg_quote(':' . strtolower($key), '/') . '/',
-                $value,
-                $sql,
-                1
-            );
+            $sql = str_replace(':' . $key, $value, $sql);
         }
 
         return trim($sql);
-    }
-
-    /**
-    * Test the parser with success data
-    *
-    * @param  array  $input
-    * @param  array  $expected
-    * @param  array  $eagerLoads
-    * @return void
-    * @dataProvider success
-    */
-    public function testParserWithSuccess($input, $expected, $eagerLoads = [])
-    {
-        // 跳过一对一统计，topthink/think-orm 库有问题
-        if (isset($input['columns']) && is_array($input['columns']) && in_array('one_count', $input['columns'])) {
-            return;
-        }
-
-        parent::testParserWithSuccess($input, $expected, $eagerLoads);
     }
 
     /**

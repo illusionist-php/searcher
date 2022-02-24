@@ -11,7 +11,7 @@ class Post extends Model
         ],
     ];
 
-    protected $table = 'posts';
+    protected $name = 'posts';
 
     protected $type = [
         'published' => 'boolean',
@@ -19,32 +19,37 @@ class Post extends Model
 
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class, 'post_id');
     }
 
     public function one()
     {
-        return $this->hasOne(Comment::class);
+        return $this->hasOne(Comment::class, 'post_id');
     }
 
     public function oneSelf()
     {
-        return $this->hasOne(static::class);
+        return $this->hasOne(static::class, 'post_id');
     }
 
     public function many()
     {
-        return $this->belongsToMany(Comment::class, 'comment_post');
+        return $this->belongsToMany(Comment::class, 'comment_post', '', 'post_id');
     }
 
     public function manySelf()
     {
-        return $this->belongsToMany(static::class);
+        return $this->belongsToMany(static::class, 'post_post', '', 'post_id');
     }
 
     public function through()
     {
-        return $this->hasManyThrough(User::class, Comment::class);
+        return $this->hasManyThrough(User::class, Comment::class, 'post_id', 'comment_id');
+    }
+
+    public function throughSelf()
+    {
+        return $this->hasManyThrough(User::class, static::class, 'post_id', 'post_id');
     }
 
     public function getQueryPhraseColumns($phrase)

@@ -2,6 +2,7 @@
 
 namespace Illusionist\Searcher\Eloquent;
 
+use Illusionist\Searcher\Contracts\Searchable;
 use Illusionist\Searcher\SearchParser as Parser;
 use Kalnoy\Nestedset\QueryBuilder as NestedsetBuilder;
 use Laravel\Scout\Builder as LaravelScoutBuilder;
@@ -31,7 +32,7 @@ class SearchParser extends Parser
      * @param  mixed  $builder
      * @return \Illusionist\Searcher\Contracts\Searchable
      */
-    protected function getSearchable($builder)
+    protected function getSearchable($builder): Searchable
     {
         if ($this->isLaravelScoutBuilder($builder)) {
             return $builder->model;

@@ -10,10 +10,10 @@ class Comment extends Model
         ],
     ];
 
-    protected $table = 'comments';
+    protected $name = 'comments';
 
     public function author()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

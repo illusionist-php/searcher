@@ -10,5 +10,5 @@ class User extends Model
         ],
     ];
 
-    protected $table = 'users';
+    protected $name = 'users';
 }

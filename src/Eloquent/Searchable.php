@@ -83,21 +83,6 @@ trait Searchable
     }
 
     /**
-     * Qualify the given column name by the model's table.
-     *
-     * @param  string  $column
-     * @return string
-     */
-    public function qualifyColumn($column)
-    {
-        if (mb_strpos($column, '.') !== false) {
-            return $column;
-        }
-
-        return $this->getTable() . '.' . $column;
-    }
-
-    /**
      * Get the actual columns that exist on the database and can be guarded.
      *
      * @return array
@@ -168,18 +153,15 @@ trait Searchable
         }
 
         if ($instance instanceof HasOneOrMany || $instance instanceof HasManyThrough) {
-            $localKeyName = explode('.', $instance->getQualifiedParentKeyName());
-            $foreignKeyName = explode('.', $instance->getQualifiedForeignKeyName());
-            return [end($localKeyName), end($foreignKeyName)];
+            return [$instance->getLocalKeyName(), $instance->getForeignKeyName()];
         }
 
         if ($instance instanceof BelongsTo) {
-            return [$instance->getForeignKey(), $instance->getOwnerKey()];
+            return [$instance->getForeignKeyName(), $instance->getOwnerKeyName()];
         }
 
         if ($instance instanceof BelongsToMany) {
-            $parentKeyName = explode('.', $instance->getQualifiedParentKeyName());
-            return [end($parentKeyName), null];
+            return [$instance->getParentKeyName(), null];
         }
 
         return false;
