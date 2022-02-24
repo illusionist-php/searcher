@@ -9,7 +9,7 @@
 ![license](https://img.shields.io/packagist/l/illusionist/searcher?style=flat-square)
 [![Build Status](https://app.travis-ci.com/illusionist-php/searcher.svg?branch=2.x)](https://app.travis-ci.com/illusionist-php/searcher)
 <br /><br />
-English | [中文](README-zh_CN.md) 
+[English](README.md) | 中文
 </div>
 
 ## ✨ 特性
