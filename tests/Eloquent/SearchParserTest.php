@@ -28,7 +28,11 @@ class SearchParserTest extends TestCase
      */
     protected function getSql($builder)
     {
-        $sql = str_replace('?', '%s', $builder->toSql());
+        $sql = preg_replace(
+            '/laravel_reserved_\d+/',
+            'laravel_reserved_0',
+            str_replace('?', '%s', $builder->toSql())
+        );
 
         $bindings = [];
 
