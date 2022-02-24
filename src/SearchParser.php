@@ -468,7 +468,7 @@ abstract class SearchParser
         }
 
         if (!empty($parsed[1])) {
-            $searchable->append($builder, $parsed[1]);
+            $searchable->append($parsed[1]);
         }
 
         if (!empty($parsed[2])) {
@@ -521,7 +521,7 @@ abstract class SearchParser
             } elseif ($searchable->isRelationAttribute($column)) {
                 $results[2][$column] = ['*'];
             } else {
-                if ($searchable->hasGetMutator($column)) {
+                if (!$not && $searchable->hasGetMutator($column)) {
                     $results[1][] = $column;
                 }
 

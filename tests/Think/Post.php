@@ -55,4 +55,9 @@ class Post extends Model
 
         return ['title'];
     }
+
+    public function getViewsAttr()
+    {
+        return 100;
+    }
 }

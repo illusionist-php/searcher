@@ -205,8 +205,10 @@ abstract class SearchParserTestCase extends TestCase
             [['columns' => 'title,comments.title'], 'select id, title from posts', ['comments' => 'select post_id, title from comments']],
             [['columns' => ['title', 'comments']], 'select id, title from posts', ['comments' => 'select * from comments']],
             [['columns' => ['title', 'comments.title', 'comments.author.name']], 'select id, title from posts', ['comments' => ['select post_id, user_id, title from comments', 'author' => 'select id, name from users']]],
+            [['columns' => ['title', 'views']], 'select title from posts', [], ['views']],
             [['not' => ['columns' => 'id,title']], 'select stars, likes, forks, watches, published, status, created_at, updated_at from posts'],
             [['not' => ['columns' => ['id', 'title', 'comments.title']]], 'select stars, likes, forks, watches, published, status, created_at, updated_at, id from posts', ['comments' => 'select id, user_id, stars, post_id from comments']],
+            [['not' => ['columns' => ['id', 'title', 'views']]], 'select stars, likes, forks, watches, published, status, created_at, updated_at from posts', [], []],
             [['columns' => ['title', 'one_count']], 'select title, (select count(*) from comments where posts.id = comments.post_id) as one_count from posts'],
             [['columns' => ['title', 'one.title']], 'select id, title from posts', ['one' => 'select post_id, title from comments']],
             [['columns' => ['title', 'many_count']], 'select title, (select count(*) from comments inner join comment_post on comments.id = comment_post.comment_id where posts.id = comment_post.post_id) as many_count from posts'],
@@ -218,21 +220,26 @@ abstract class SearchParserTestCase extends TestCase
     }
 
     /**
-    * Test the parser with success data
-    *
-    * @param  array  $input
-    * @param  array  $expected
-    * @param  array  $eagerLoads
-    * @return void
-    * @dataProvider success
-    */
-    public function testParserWithSuccess($input, $expected, $eagerLoads = [])
+     * Test the parser with success data
+     *
+     * @param  array  $input
+     * @param  array  $expected
+     * @param  array  $eagerLoads
+     * @param  array|null  $appends
+     * @return void
+     * @dataProvider success
+     */
+    public function testParserWithSuccess($input, $expected, $eagerLoads = [], $appends = null)
     {
         $builder = $this->parser->import($input);
         $actual = $this->getSql($builder);
 
         $this->assertEagerLoads($builder, $eagerLoads)
             ->assertEquals($expected, $actual);
+
+        if ($appends !== null) {
+            $this->assertAppend($builder, $appends);
+        }
     }
 
     /**
@@ -245,5 +252,30 @@ abstract class SearchParserTestCase extends TestCase
     protected function assertEagerLoads($builder, $eagerLoads)
     {
         return $this;
+    }
+
+    /**
+     * Asserts if a builder has a given append attributes.
+     *
+     * @param  mixed  $builder
+     * @param  array  $appends
+     * @return $this
+     */
+    protected function assertAppend($builder, $appends)
+    {
+        $this->assertEquals($appends, $this->getBuilderAppends($builder));
+
+        return $this;
+    }
+
+    /**
+     * Get the appends attribute of the builder.
+     *
+     * @param  mixed  $builder
+     * @return array
+     */
+    protected function getBuilderAppends($builder)
+    {
+        return [];
     }
 }

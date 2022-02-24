@@ -2,8 +2,10 @@
 
 namespace Tests\Eloquent;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illusionist\Searcher\Eloquent\SearchParser;
+use ReflectionClass;
 use Tests\SearchParserTestCase as TestCase;
 
 class SearchParserTest extends TestCase
@@ -46,7 +48,7 @@ class SearchParserTest extends TestCase
     /**
      * Asserts if a builder has a given eager loads.
      *
-     * @param  mixed  $builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @param  array  $eagerLoads
      * @return $this
      */
@@ -76,5 +78,22 @@ class SearchParserTest extends TestCase
         }
 
         return $this;
+    }
+
+    /**
+     * Get the appends attribute of the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return array
+     */
+    protected function getBuilderAppends($builder)
+    {
+        $reflection = new ReflectionClass(Model::class);
+
+        $property = $reflection->getProperty('appends');
+
+        $property->setAccessible(true);
+
+        return $property->getValue($builder->getModel());
     }
 }

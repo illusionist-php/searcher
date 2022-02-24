@@ -6,6 +6,7 @@ use Illusionist\Searcher\Think\SearchParser;
 use ReflectionClass;
 use Tests\SearchParserTestCase as TestCase;
 use think\Db;
+use think\Model;
 use think\model\relation\BelongsToMany;
 use think\model\relation\HasManyThrough;
 
@@ -99,17 +100,18 @@ class SearchParserTest extends TestCase
     * @param  array  $input
     * @param  array  $expected
     * @param  array  $eagerLoads
+    * @param  array|null  $appends
     * @return void
     * @dataProvider success
     */
-    public function testParserWithSuccess($input, $expected, $eagerLoads = [])
+    public function testParserWithSuccess($input, $expected, $eagerLoads = [], $appends = null)
     {
         // 跳过一对一统计，topthink/think-orm 库有问题
         if (isset($input['columns']) && is_array($input['columns']) && in_array('one_count', $input['columns'])) {
             return;
         }
 
-        parent::testParserWithSuccess($input, $expected, $eagerLoads);
+        parent::testParserWithSuccess($input, $expected, $eagerLoads, $appends);
     }
 
     /**
@@ -147,5 +149,22 @@ class SearchParserTest extends TestCase
         }
 
         return $this;
+    }
+
+    /**
+     * Get the appends attribute of the builder.
+     *
+     * @param  \think\db\Query  $builder
+     * @return array
+     */
+    protected function getBuilderAppends($builder)
+    {
+        $reflection = new ReflectionClass(Model::class);
+
+        $property = $reflection->getProperty('append');
+
+        $property->setAccessible(true);
+
+        return $property->getValue($builder->getModel());
     }
 }

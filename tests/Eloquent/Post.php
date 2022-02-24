@@ -53,4 +53,9 @@ class Post extends Model
 
         return ['title'];
     }
+
+    public function getViewsAttribute()
+    {
+        return 100;
+    }
 }
