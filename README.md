@@ -12,6 +12,28 @@ Generates database queries based on search syntax.
 English | [中文](README-zh_CN.md) 
 </div>
 
+## 🏗 Scene
+
+- Mid background system
+- Complex front-end query conditions
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use Illuminate\Http\Request;
+
+class PostsController extends Controller
+{
+    public function index(Request $request)
+    {
+        return Post::search($request->all())->get();
+    }
+}
+```
+
 ## ✨ Features
 
 - Zero configuration
