@@ -312,6 +312,14 @@ abstract class SearchParser
                     $boolean,
                     $not
                 );
+            } else if ($column === '__KEYWORD__') {
+                $this->addBooleanTerm(
+                    $builder,
+                    'or',
+                    $this->createPhraseTerm($searchable->getQueryPhraseColumns($value), $value),
+                    $boolean,
+                    $not
+                );
             } else {
                 switch (static::studly($column)) {
                     case 'Select':
@@ -435,9 +443,11 @@ abstract class SearchParser
             return $this->addTerms($builder, $term, $boolean, $not);
         }
 
-        $this->where($builder, function ($builder) use ($operator, $term, $not) {
-            $this->addTerms($builder, $term, $operator, $not);
-        }, null, null, $boolean);
+        if (!empty($term)) {
+            $this->where($builder, function ($builder) use ($operator, $term, $not) {
+                $this->addTerms($builder, $term, $operator, $not);
+            }, null, null, $boolean);
+        }
 
         return $this;
     }
