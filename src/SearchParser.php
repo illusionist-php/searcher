@@ -295,6 +295,7 @@ abstract class SearchParser
     protected function addTerms($builder, $terms, $boolean = 'and', $not = false)
     {
         $searchable = $this->getSearchable($builder);
+        $relations = [];
 
         foreach ($terms as $key => $value) {
             if (is_int($key)) {
@@ -312,14 +313,23 @@ abstract class SearchParser
                     $boolean,
                     $not
                 );
-            } else if ($column === '__KEYWORD__') {
+            } elseif ($column === '__KEYWORD__') {
                 $this->addBooleanTerm(
                     $builder,
                     'or',
-                    $this->createPhraseTerm($searchable->getQueryPhraseColumns($value), $value),
+                    $searchable->getQueryPhraseTerm($value),
                     $boolean,
                     $not
                 );
+            } elseif (mb_strpos($column, '.') !== false) {
+                // 关联的列单独处理，用于支持关联的多列查询
+                [$name, $field] = explode('.', $column, 2);
+
+                if (!isset($relations[$name])) {
+                    $relations[$name] = [];
+                }
+
+                $relations[$name] = array_merge_recursive($relations[$name], [$boolean => [$field => $value]]);
             } else {
                 switch (static::studly($column)) {
                     case 'Select':
@@ -358,6 +368,10 @@ abstract class SearchParser
             }
         }
 
+        if (!empty($relations)) {
+            $this->addTerms($builder, $relations, $boolean, $not);
+        }
+
         return $this;
     }
 
@@ -385,15 +399,13 @@ abstract class SearchParser
         $searchable = $this->getSearchable($builder);
 
         if (!$searchable->isSearchable($term)) {
-            if ($columns = $searchable->getQueryPhraseColumns($term)) {
-                $this->addBooleanTerm(
-                    $builder,
-                    'or',
-                    $this->createPhraseTerm($columns, $term),
-                    $boolean,
-                    $not
-                );
-            }
+            $this->addBooleanTerm(
+                $builder,
+                'or',
+                $searchable->getQueryPhraseTerm($term),
+                $boolean,
+                $not
+            );
         } elseif ($searchable->isRelationAttribute($term)) {
             $this->has($builder, $term, $not ? '<' : '>=', 1, $boolean);
         } elseif ($searchable->isBooleanAttribute($term)) {
@@ -403,28 +415,6 @@ abstract class SearchParser
         }
 
         return $this;
-    }
-
-    /**
-     * Create a phrase term for the query.
-     *
-     * @param  array  $columns
-     * @param  string  $value
-     * @return array
-     */
-    protected function createPhraseTerm($columns, $value)
-    {
-        $term = [];
-
-        foreach ($columns as $column => $operator) {
-            if (is_int($column)) {
-                $term[$operator] = ['like', "%{$value}%"];
-            } else {
-                $term[$column] = [$operator, $value];
-            }
-        }
-
-        return $term;
     }
 
     /**
@@ -694,60 +684,30 @@ abstract class SearchParser
      */
     protected function addQueryTerm($builder, $column, $value, $boolean = 'and', $not = false)
     {
-        list($key, $val) = $this->normalizeQueryTerm($column, $value);
         $searchable = $this->getSearchable($builder);
 
-        if (!$searchable->isSearchable($key)) {
+        if (!$searchable->isSearchable($column)) {
             return $this;
         }
 
-        if ($searchable->isRelationAttribute($key)) {
-            list($operator, $val, $callback) = $this->parseRelationValue($val, $not);
-            $this->has($builder, $key, $operator, $val, $boolean, $callback);
-        } elseif (is_null($val)) {
-            $this->whereNull($builder, $key, $boolean, $not);
+        if ($searchable->isRelationAttribute($column)) {
+            [$operator, $val, $callback] = $this->parseRelationValue($value, $not);
+            $this->has($builder, $column, $operator, $val, $boolean, $callback);
+        } elseif (is_null($value)) {
+            $this->whereNull($builder, $column, $boolean, $not);
         } else {
-            list($operator, $val) = $searchable->isDateAttribute($key)
-                ? $this->parseDateValue($val, $not)
-                : $this->parseValue($val, $not);
+            [$operator, $val] = $searchable->isDateAttribute($column)
+                ? $this->parseDateValue($value, $not)
+                : $this->parseValue($value, $not);
 
             if ($this->isRangeOperator($operator)) {
-                $this->{'where' . ucfirst($operator)}($builder, $key, $val, $boolean, $not);
+                $this->{'where' . ucfirst($operator)}($builder, $column, $val, $boolean, $not);
             } else {
-                $this->where($builder, $key, $operator, $val, $boolean);
+                $this->where($builder, $column, $operator, $val, $boolean);
             }
         }
 
         return $this;
-    }
-
-    /**
-     * Normalize a given term of the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $value
-     * @return array
-     */
-    protected function normalizeQueryTerm($column, $value)
-    {
-        if (mb_strpos($column, '.') === false) {
-            return [$column, $value];
-        }
-
-        $segments = explode('.', trim($column, '.'));
-        $length = count($segments);
-
-        if ($length < 2) {
-            return [$column, $value];
-        }
-
-        $val = $value;
-
-        for ($i = $length - 1; $i > 0; $i--) {
-            $val = [$segments[$i] => $val];
-        }
-
-        return [$segments[0], $val];
     }
 
     /**

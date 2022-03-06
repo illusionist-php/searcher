@@ -50,10 +50,10 @@ class Post extends Model
         return $this->hasManyThrough(User::class, static::class);
     }
 
-    public function getQueryPhraseColumns($phrase)
+    protected function getQueryPhraseColumns($phrase)
     {
         if (is_numeric($phrase)) {
-            return ['stars' => '>=', 'comments.stars' => '>='];
+            return ['stars' => '>=', 'comments.stars' => '>=', 'comments.dislikes' => '<'];
         }
 
         return ['title'];

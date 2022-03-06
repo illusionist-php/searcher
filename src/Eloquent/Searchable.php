@@ -99,12 +99,33 @@ trait Searchable
     }
 
     /**
+     * Get the term of the query phrase.
+     *
+     * @param  string  $phrase
+     * @return array
+     */
+    public function getQueryPhraseTerm($phrase)
+    {
+        $term = [];
+
+        foreach ($this->getQueryPhraseColumns($phrase) as $column => $operator) {
+            if (is_int($column)) {
+                $term[$operator] = ['like', "%{$phrase}%"];
+            } else {
+                $term[$column] = [$operator, $phrase];
+            }
+        }
+
+        return $term;
+    }
+
+    /**
      * Get the columns of the query phrase.
      *
      * @param  string  $phrase
      * @return array
      */
-    public function getQueryPhraseColumns($phrase)
+    protected function getQueryPhraseColumns($phrase)
     {
         return [];
     }
