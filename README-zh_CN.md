@@ -12,6 +12,28 @@
 [English](README.md)  | 中文
 </div>
 
+## 🏗 场景
+
+- 中后台系统
+- 复杂的前端查询条件
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use Illuminate\Http\Request;
+
+class PostsController extends Controller
+{
+    public function index(Request $request)
+    {
+        return Post::search($request->all())->get();
+    }
+}
+```
+
 ## ✨ 特性
 
 - 零配置
