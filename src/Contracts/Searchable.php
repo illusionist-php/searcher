@@ -28,12 +28,12 @@ interface Searchable
     public function getGuardableColumns();
 
     /**
-     * Get the columns of the query phrase.
+     * Get the term of the query phrase.
      *
      * @param  string  $phrase
      * @return array
      */
-    public function getQueryPhraseColumns($phrase);
+    public function getQueryPhraseTerm($phrase);
 
     /**
      * Get the real name of the given search column.

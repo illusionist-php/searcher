@@ -294,6 +294,7 @@ abstract class SearchParser
     protected function addTerms($builder, $terms, $boolean = 'and', $not = false)
     {
         $searchable = $this->getSearchable($builder);
+        $relations = [];
 
         foreach ($terms as $key => $value) {
             if (is_int($key)) {
@@ -311,6 +312,22 @@ abstract class SearchParser
                     $boolean,
                     $not
                 );
+            } elseif ($column === '__KEYWORD__') {
+                $this->addBooleanTerm(
+                    $builder,
+                    'or',
+                    $searchable->getQueryPhraseTerm($value),
+                    $boolean,
+                    $not
+                );
+            } elseif (mb_strpos($column, '.') !== false) {
+                list($name, $field) = explode('.', $column, 2);
+
+                if (!isset($relations[$name])) {
+                    $relations[$name] = [];
+                }
+
+                $relations[$name] = array_merge_recursive($relations[$name], [$boolean => [$field => $value]]);
             } else {
                 switch (static::studly($column)) {
                     case 'Select':
@@ -349,6 +366,10 @@ abstract class SearchParser
             }
         }
 
+        if (!empty($relations)) {
+            $this->addTerms($builder, $relations, $boolean, $not);
+        }
+
         return $this;
     }
 
@@ -376,15 +397,13 @@ abstract class SearchParser
         $searchable = $this->getSearchable($builder);
 
         if (!$searchable->isSearchable($term)) {
-            if ($columns = $searchable->getQueryPhraseColumns($term)) {
-                $this->addBooleanTerm(
-                    $builder,
-                    'or',
-                    $this->createPhraseTerm($columns, $term),
-                    $boolean,
-                    $not
-                );
-            }
+            $this->addBooleanTerm(
+                $builder,
+                'or',
+                $searchable->getQueryPhraseTerm($term),
+                $boolean,
+                $not
+            );
         } elseif ($searchable->isRelationAttribute($term)) {
             $this->has($builder, $term, $not ? '<' : '>=', 1, $boolean);
         } elseif ($searchable->isBooleanAttribute($term)) {
@@ -394,28 +413,6 @@ abstract class SearchParser
         }
 
         return $this;
-    }
-
-    /**
-     * Create a phrase term for the query.
-     *
-     * @param  array  $columns
-     * @param  string  $value
-     * @return array
-     */
-    protected function createPhraseTerm($columns, $value)
-    {
-        $term = [];
-
-        foreach ($columns as $column => $operator) {
-            if (is_int($column)) {
-                $term[$operator] = ['like', "%{$value}%"];
-            } else {
-                $term[$column] = [$operator, $value];
-            }
-        }
-
-        return $term;
     }
 
     /**

@@ -6,7 +6,7 @@ class User extends Model
 {
     protected static $guardableColumns = [
         'Tests\Think\User' => [
-            'id', 'name',
+            'id', 'name', 'phone',
         ],
     ];
 

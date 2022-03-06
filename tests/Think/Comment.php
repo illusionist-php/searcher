@@ -6,7 +6,7 @@ class Comment extends Model
 {
     protected static $guardableColumns = [
         'Tests\Think\Comment' => [
-            'id', 'post_id', 'user_id', 'title', 'stars',
+            'id', 'post_id', 'user_id', 'title', 'stars', 'dislikes',
         ],
     ];
 
