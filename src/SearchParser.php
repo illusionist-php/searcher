@@ -509,7 +509,7 @@ abstract class SearchParser
                     $results[3][] = $relation;
                 }
             } elseif (mb_strpos($column, '.') !== false) {
-                list($relation, $name) = explode('.', $column, 2);
+                [$relation, $name] = explode('.', $column, 2);
 
                 if (
                     $searchable->isVisible($relation) &&
@@ -561,7 +561,7 @@ abstract class SearchParser
     protected function createWithRelations($searchable, $relations, &$localKeys = [], $not = false)
     {
         foreach ($relations as $method => $columns) {
-            list($localKey, $foreignKey) = $searchable->getRelationKeyNames($method, $joined);
+            [$localKey, $foreignKey] = $searchable->getRelationKeyNames($method, $joined);
 
             if (!empty($localKey)) {
                 $localKeys[] = $localKey;
@@ -770,7 +770,7 @@ abstract class SearchParser
             return false;
         }
 
-        list($operator, $count) = $expression;
+        [$operator, $count] = $expression;
 
         return $this->isBasicOperator($operator) && is_numeric($count);
     }
@@ -807,7 +807,7 @@ abstract class SearchParser
      */
     protected function parseDateValue($value, $not = false)
     {
-        list($operator, $val) = $this->parseValue($value, $not);
+        [$operator, $val] = $this->parseValue($value, $not);
 
         try {
             if ($this->isRangeOperator($operator)) {
@@ -896,7 +896,7 @@ abstract class SearchParser
             return false;
         }
 
-        list($operator, $value) = $expression;
+        [$operator, $value] = $expression;
 
         return $operator === 'like' &&
             mb_substr($value, 0, 1) === '%' &&
