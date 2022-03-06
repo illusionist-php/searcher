@@ -63,6 +63,8 @@ abstract class SearchParserTestCase extends TestCase
             // Solo.
             [['lonely'], 'select * from posts where title like \'%lonely%\''],
             [['3000'], 'select * from posts where (stars >= \'3000\' or exists (select * from comments where posts.id = comments.post_id and stars >= \'3000\'))'],
+            [['keyword' => 'lonely'], 'select * from posts where title like \'%lonely%\''],
+            [['keyword' => '3000'], 'select * from posts where (stars >= \'3000\' or exists (select * from comments where posts.id = comments.post_id and stars >= \'3000\'))'],
 
             // Boolean.
             [['published'], 'select * from posts where published = true'],

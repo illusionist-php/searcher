@@ -7,7 +7,7 @@
 ![php](https://img.shields.io/packagist/php-v/illusionist/searcher?style=flat-square)
 ![downloads](https://img.shields.io/packagist/dm/illusionist/searcher?style=flat-square)
 ![license](https://img.shields.io/packagist/l/illusionist/searcher?style=flat-square)
-[![Build Status](https://app.travis-ci.com/illusionist-php/searcher.svg?branch=master)](https://app.travis-ci.com/illusionist-php/searcher)
+[![Build Status](https://app.travis-ci.com/illusionist-php/searcher.svg?branch=2.x)](https://app.travis-ci.com/illusionist-php/searcher)
 <br /><br />
 [English](README.md) | 中文 
 </div>

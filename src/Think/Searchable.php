@@ -112,6 +112,8 @@ trait Searchable
     public function getRelaSearchName($key)
     {
         switch ($key) {
+            case 'keyword':
+                return '__KEYWORD__';
             case 'columns':
                 return 'select';
             case 'sort':
