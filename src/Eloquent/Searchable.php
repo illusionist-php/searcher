@@ -126,6 +126,8 @@ trait Searchable
                 return 'order_by';
             case 'from':
                 return 'offset';
+            case 'take':
+                return 'limit';
             default:
                 return $key;
         }
