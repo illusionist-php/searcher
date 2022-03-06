@@ -62,9 +62,9 @@ abstract class SearchParserTestCase extends TestCase
 
             // Solo.
             [['lonely'], 'select * from posts where title like \'%lonely%\''],
-            [['3000'], 'select * from posts where (stars >= \'3000\' or exists (select * from comments where posts.id = comments.post_id and stars >= \'3000\'))'],
+            [['3000'], 'select * from posts where (stars >= \'3000\' or exists (select * from comments where posts.id = comments.post_id and (stars >= \'3000\' or dislikes < \'3000\')))'],
             [['keyword' => 'lonely'], 'select * from posts where title like \'%lonely%\''],
-            [['keyword' => '3000'], 'select * from posts where (stars >= \'3000\' or exists (select * from comments where posts.id = comments.post_id and stars >= \'3000\'))'],
+            [['keyword' => '3000'], 'select * from posts where (stars >= \'3000\' or exists (select * from comments where posts.id = comments.post_id and (stars >= \'3000\' or dislikes < \'3000\')))'],
 
             // Boolean.
             [['published'], 'select * from posts where published = true'],
@@ -192,7 +192,9 @@ abstract class SearchParserTestCase extends TestCase
 
             // Nested relationships.
             [['comments' => ['author' => ['name' => 'John']]], 'select * from posts where exists (select * from comments where posts.id = comments.post_id and exists (select * from users where comments.user_id = users.id and name = \'John\'))'],
+            [['comments' => ['author' => ['name' => 'John', 'phone' => '12345']]], 'select * from posts where exists (select * from comments where posts.id = comments.post_id and exists (select * from users where comments.user_id = users.id and name = \'John\' and phone = \'12345\'))'],
             [['comments.author.name' => 'John'], 'select * from posts where exists (select * from comments where posts.id = comments.post_id and exists (select * from users where comments.user_id = users.id and name = \'John\'))'],
+            [['comments.author.name' => 'John', 'comments.author.phone' => '12345'], 'select * from posts where exists (select * from comments where posts.id = comments.post_id and exists (select * from users where comments.user_id = users.id and name = \'John\' and phone = \'12345\'))'],
 
             // Limit and offset.
             [['limit' => 10], 'select * from posts limit 10'],
@@ -210,7 +212,7 @@ abstract class SearchParserTestCase extends TestCase
             [['columns' => ['title', 'comments.title', 'comments.author.name']], 'select id, title from posts', ['comments' => ['select post_id, user_id, title from comments', 'author' => 'select id, name from users']]],
             [['columns' => ['title', 'views']], 'select title from posts', [], ['views']],
             [['not' => ['columns' => 'id,title']], 'select stars, likes, forks, watches, published, status, created_at, updated_at from posts'],
-            [['not' => ['columns' => ['id', 'title', 'comments.title']]], 'select stars, likes, forks, watches, published, status, created_at, updated_at, id from posts', ['comments' => 'select id, user_id, stars, post_id from comments']],
+            [['not' => ['columns' => ['id', 'title', 'comments.title']]], 'select stars, likes, forks, watches, published, status, created_at, updated_at, id from posts', ['comments' => 'select id, user_id, stars, dislikes, post_id from comments']],
             [['not' => ['columns' => ['id', 'title', 'views']]], 'select stars, likes, forks, watches, published, status, created_at, updated_at from posts', [], []],
             [['columns' => ['title', 'one_count']], 'select title, (select count(*) from comments where posts.id = comments.post_id) as one_count from posts'],
             [['columns' => ['title', 'one.title']], 'select id, title from posts', ['one' => 'select post_id, title from comments']],
