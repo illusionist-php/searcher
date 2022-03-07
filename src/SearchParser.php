@@ -493,6 +493,8 @@ abstract class SearchParser
         $results = [[], [], [], []];
 
         foreach ($columns as $column) {
+            $column = trim($column);
+
             if ($column === '*') {
                 $results[0] = ['*'];
             } elseif (
