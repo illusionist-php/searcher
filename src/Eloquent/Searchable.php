@@ -186,7 +186,7 @@ trait Searchable
         }
 
         if ($instance instanceof BelongsToMany) {
-            return [$instance->getParentKeyName(), null];
+            return [$instance->getParentKeyName(), $instance->getRelatedKeyName()];
         }
 
         return false;

@@ -180,7 +180,7 @@ trait Searchable
         }
 
         if ($instance instanceof BelongsToMany) {
-            return [$this->getPk(), null];
+            return [$this->getPk(), $instance->getModel()->getPk()];
         }
 
 
