@@ -207,7 +207,7 @@ abstract class SearchParserTestCase extends TestCase
 
             // Select
             [['columns' => ['title', 'comments_count']], 'select title, (select count(*) from comments where posts.id = comments.post_id) as comments_count from posts'],
-            [['columns' => 'title,comments.title'], 'select id, title from posts', ['comments' => 'select post_id, title from comments']],
+            [['columns' => 'title, comments.title'], 'select id, title from posts', ['comments' => 'select post_id, title from comments']],
             [['columns' => ['title', 'comments']], 'select id, title from posts', ['comments' => 'select * from comments']],
             [['columns' => ['title', 'comments.title', 'comments.author.name']], 'select id, title from posts', ['comments' => ['select post_id, user_id, title from comments', 'author' => 'select id, name from users']]],
             [['columns' => ['title', 'views']], 'select title from posts', [], ['views']],

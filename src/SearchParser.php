@@ -497,7 +497,9 @@ abstract class SearchParser
         $results = [[], [], [], []];
 
         foreach ($columns as $column) {
-            if ($column === '*') {
+            if (($column = trim($column)) === '') {
+                // Skip space.
+            } elseif ($column === '*') {
                 $results[0] = ['*'];
             } elseif (
                 mb_substr($column, -6) === '_count' &&
