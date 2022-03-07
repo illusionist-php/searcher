@@ -214,10 +214,10 @@ abstract class SearchParserTestCase extends TestCase
             [['columns' => ['title', 'one_count']], 'select title, (select count(*) from comments where posts.id = comments.post_id) as one_count from posts'],
             [['columns' => ['title', 'one.title']], 'select id, title from posts', ['one' => 'select post_id, title from comments']],
             [['columns' => ['title', 'many_count']], 'select title, (select count(*) from comments inner join comment_post on comments.id = comment_post.comment_id where posts.id = comment_post.post_id) as many_count from posts'],
-            [['columns' => ['title', 'many.title']], 'select id, title from posts', ['many' => 'select comments.title from comments inner join comment_post on comments.id = comment_post.comment_id']],
+            [['columns' => ['title', 'many.title']], 'select id, title from posts', ['many' => 'select comments.id, comments.title from comments inner join comment_post on comments.id = comment_post.comment_id']],
             [['columns' => ['title', 'through.name']], 'select id, title from posts', ['through' => 'select users.name from users inner join comments on comments.id = users.comment_id']],
             [['columns' => ['title', 'oneSelf.title']], 'select id, title from posts', ['oneSelf' => 'select title from posts']],
-            [['columns' => ['title', 'manySelf.title']], 'select id, title from posts', ['manySelf' => 'select posts.title from posts inner join post_post on posts.id = post_post.post_id']],
+            [['columns' => ['title', 'manySelf.title']], 'select id, title from posts', ['manySelf' => 'select posts.id, posts.title from posts inner join post_post on posts.id = post_post.post_id']],
         ];
     }
 

@@ -202,7 +202,7 @@ trait Searchable
 
         if ($instance instanceof BelongsToMany) {
             $parentKeyName = explode('.', $instance->getQualifiedParentKeyName());
-            return [end($parentKeyName), null];
+            return [end($parentKeyName), $instance->getRelated()->getKeyName()];
         }
 
         return false;
