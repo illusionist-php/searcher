@@ -5,7 +5,7 @@ Generates database queries based on search syntax.
 
 ![packagist](https://img.shields.io/packagist/v/illusionist/searcher?style=flat-square)
 ![php](https://img.shields.io/packagist/php-v/illusionist/searcher?style=flat-square)
-![downloads](https://img.shields.io/packagist/dm/illusionist/searcher?style=flat-square)
+![downloads](https://img.shields.io/packagist/dt/illusionist/searcher?style=flat-square)
 ![license](https://img.shields.io/packagist/l/illusionist/searcher?style=flat-square)
 [![Build Status](https://app.travis-ci.com/illusionist-php/searcher.svg?branch=1.0)](https://app.travis-ci.com/illusionist-php/searcher)
 <br /><br />
