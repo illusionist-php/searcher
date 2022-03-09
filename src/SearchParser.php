@@ -522,6 +522,10 @@ abstract class SearchParser
             } else {
                 if (!$not && $searchable->hasGetMutator($column)) {
                     $results[1][] = $column;
+
+                    if ($results[0] !== ['*']) {
+                        array_push($results[0], ...$searchable->getMutatorDependents($column));
+                    }
                 }
 
                 if ($results[0] !== ['*']) {
@@ -542,6 +546,11 @@ abstract class SearchParser
             if ($not && !empty($localKeys)) {
                 array_push($results[0], ...$localKeys);
             }
+        }
+
+        // 追加属性必须排除掉表中的列以防止访问器无法正确获得源值
+        if (!empty($results[1])) {
+            $results[1] = array_diff($results[1], $searchable->getGuardableColumns());
         }
 
         return $results;

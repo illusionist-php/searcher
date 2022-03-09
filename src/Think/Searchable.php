@@ -201,6 +201,17 @@ trait Searchable
     }
 
     /**
+     * Get the dependent columns of the mutator column.
+     *
+     * @param  string  $column
+     * @return array
+     */
+    public function getMutatorDependents($column)
+    {
+        return [];
+    }
+
+    /**
      * Determine if a get mutator exists for an attribute.
      *
      * @param  string  $key
