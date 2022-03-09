@@ -193,6 +193,17 @@ trait Searchable
     }
 
     /**
+     * Get the dependent columns of the mutator column.
+     *
+     * @param  string  $column
+     * @return array
+     */
+    public function getMutatorDependents($column)
+    {
+        return [];
+    }
+
+    /**
      * Determine if the given attribute is visible.
      *
      * @param  string  $key
