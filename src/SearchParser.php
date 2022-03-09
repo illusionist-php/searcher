@@ -522,9 +522,10 @@ abstract class SearchParser
             } else {
                 if (!$not && $searchable->hasGetMutator($column)) {
                     $results[1][] = $column;
+                    $dependents = $searchable->getMutatorDependents($column);
 
-                    if ($results[0] !== ['*']) {
-                        array_push($results[0], ...$searchable->getMutatorDependents($column));
+                    if (!empty($dependents) && $results[0] !== ['*']) {
+                        array_push($results[0], ...$dependents);
                     }
                 }
 
